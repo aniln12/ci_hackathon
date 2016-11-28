@@ -19,7 +19,7 @@ library(reshape2)
 library(dplyr)
 library(lubridate)
 
-setwd("/home/ubuntu/camilo/ci_hackathon/R_stuff/food_security/")  #replace with your working directory here
+setwd("/home/ubuntu/ci_hackathon-master/R_stuff/food_security/")  #replace with your working directory here
 
 pg_conf <- read.csv('rds_settings.csv', stringsAsFactors=FALSE)
 
