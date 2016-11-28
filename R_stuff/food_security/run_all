@@ -1,0 +1,3 @@
+#!/bin/bash
+Rscript FoodSecurity.VS.Landscape.R
+python load_into_postgres.py

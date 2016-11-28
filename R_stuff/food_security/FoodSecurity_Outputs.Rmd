@@ -1,0 +1,107 @@
+---
+title: "Food Security"
+output: html_document
+---
+
+```{r, include=FALSE}
+library(maps)
+library(mapdata)
+library(calibrate)
+library(dplyr)
+library(ggplot2)
+
+setwd("D:/Documents and Settings/mcooper/GitHub/vs-indicators-calc/FoodSecurity/")
+
+
+df <- read.csv("FoodSecurity.VS.Landscape.csv")
+
+rbPal <- colorRampPalette(c('red','blue'))
+
+#This adds a column of color values
+# based on the y values
+df$accesscolor <- rbPal(10)[as.numeric(cut(df$access,breaks = 10))]
+df$utilizationcolor <- rbPal(10)[as.numeric(cut(df$utilization,breaks = 10))]
+```
+
+
+#Uganda
+```{r, echo=FALSE}
+ggplot(df[df$country=="UGA", ], aes(landscape, access)) +
+  geom_bar(stat="identity") + 
+  ggtitle("Food Security Rankings in UGA")
+
+ggplot(df[df$country=="UGA", ], aes(landscape, utilization)) +
+  geom_bar(stat="identity") + 
+  ggtitle("Food Security Rankings in UGA")
+
+sel <- df[df$country=='UGA' , ]
+
+map('worldHires', 'Uganda')
+title('Food Access in Uganda')
+points(sel[ , c('longitude', 'latitude')], pch=20, col=sel$accesscolor, cex=3)
+textxy(sel$longitude, sel$latitude, labs=paste0(sel$landscape, '\n', signif(sel$access, 2)), cex=0.5)
+
+map('worldHires', 'Uganda') 
+title('Food Utilization in Uganda')
+points(sel[ , c('longitude', 'latitude')], pch=20, col=sel$utilizationcolor, cex=3)
+textxy(sel$longitude, sel$latitude, labs=paste0(sel$landscape, '\n', signif(sel$utilization, 2)), cex=0.5)
+```
+
+#Tanzania
+```{r, echo=FALSE}
+ggplot(df[df$country=="TZA", ], aes(landscape, access)) +
+  geom_bar(stat="identity") + 
+  ggtitle("Food Security Rankings in TZA")
+
+ggplot(df[df$country=="TZA", ], aes(landscape, utilization)) +
+  geom_bar(stat="identity") + 
+  ggtitle("Food Security Rankings in TZA")
+
+sel <- df[df$country=='TZA' , ]
+
+map('worldHires', 'Tanzania')
+title('Food Access in Tanzania')
+points(sel[ , c('longitude', 'latitude')], pch=20, col=sel$accesscolor, cex=3)
+textxy(sel$longitude, sel$latitude, labs=paste0(sel$landscape, '\n', signif(sel$access, 2)), cex=0.5)
+
+map('worldHires', 'Tanzania') 
+title('Food Utilization in Tanzania')
+points(sel[ , c('longitude', 'latitude')], pch=20, col=sel$utilizationcolor, cex=3)
+textxy(sel$longitude, sel$latitude, labs=paste0(sel$landscape, '\n', signif(sel$utilization, 2)), cex=0.5)
+
+```
+
+#Rwanda
+```{r, echo=FALSE}
+
+ggplot(df[df$country=="RWA", ], aes(landscape, access)) +
+  geom_bar(stat="identity") + 
+  ggtitle("Food Security Rankings in RWA")
+
+ggplot(df[df$country=="RWA", ], aes(landscape, utilization)) +
+  geom_bar(stat="identity") + 
+  ggtitle("Food Security Rankings in RWA")
+
+sel <- df[df$country=='RWA' , ]
+
+map('worldHires', 'Rwanda')
+title('Food Access in Rwanda')
+points(sel[ , c('longitude', 'latitude')], pch=20, col=sel$accesscolor, cex=3)
+textxy(sel$longitude, sel$latitude, labs=paste0(sel$landscape, '\n', signif(sel$access, 2)), cex=0.5)
+
+map('worldHires', 'Rwanda') 
+title('Food Utilization in Rwanda')
+points(sel[ , c('longitude', 'latitude')], pch=20, col=sel$utilizationcolor, cex=3)
+textxy(sel$longitude, sel$latitude, labs=paste0(sel$landscape, '\n', signif(sel$utilization, 2)), cex=0.5)
+```
+
+#All
+```{r, echo=FALSE}
+map('worldHires', c('Rwanda', 'Tanzania', 'Uganda'))
+title('Food Access in East Africa')
+points(df[ , c('longitude', 'latitude')], pch=20, col=df$accesscolor, cex=3)
+
+map('worldHires', c('Rwanda', 'Tanzania', 'Uganda'))
+title('Food Utilization in East AFrica')
+points(df[ , c('longitude', 'latitude')], pch=20, col=df$utilizationcolor, cex=3)
+```

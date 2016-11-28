@@ -1,0 +1,3 @@
+#!/bin/bash
+( cd food_security/; ./run_all )
+( cd nutrition/; ./run_all)
