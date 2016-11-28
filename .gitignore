@@ -1,0 +1,7 @@
+# Terraform modules made by the Capital One community.
+
+.idea
+.DS_Store
+.terraform
+.tfstate.backup
+.git
