@@ -1,0 +1,111 @@
+---
+title: "Nutrition Graphics"
+output: html_document
+---
+
+```{r, include=FALSE}
+library(maps)
+library(mapdata)
+library(calibrate)
+library(dplyr)
+library(reshape2)
+library(ggplot2)
+
+nutrition_indid <- read.csv('Nutrition.Individual.csv') %>% 
+  select(Country, Landscape.., Individual.ID, zlen, zwei, zwfl) %>% 
+  rename(Landscape=Landscape.., Height=zlen, Weight=zwei, Height.by.Weight=zwfl) %>%
+  melt(id.vars=c('Country', 'Landscape', 'Individual.ID')) %>%
+  na.omit
+
+nutrition_landscape <- read.csv('Nutrition.Landscape.csv')
+
+failure <- data.frame(val=c(-3, -2), Cutoff=c('Severe Failure', 'Failure'))
+
+#Create a function to generate a continuous color palette
+rbPal <- colorRampPalette(c('blue','red'))
+
+#This adds a column of color values
+# based on the y values
+nutrition_landscape$color <- rbPal(10)[as.numeric(cut(nutrition_landscape$percent_Composite_Index_Anthropometric_Failure,breaks = 10))]
+
+```
+
+##Tanzania
+```{r, echo=FALSE, warning=FALSE}
+
+ggplot(nutrition_indid[nutrition_indid$Country=='TZA',], aes(value, fill = Landscape)) +
+  geom_density(alpha = 0.2) + 
+  ggtitle("Ditribution of children's measurments (6 months - 5 years old)") + 
+  geom_vline(data = failure, aes(xintercept = val, colour=Cutoff)) +
+  xlab('Z-scores for childrens measurements, normalized by age') +
+  facet_grid(.~variable) + 
+  theme(legend.position="bottom")
+
+
+map('worldHires', 'Tanzania') 
+sel <- nutrition_landscape[nutrition_landscape$Country=='TZA' , ]
+title('Percentage of children with any Anthropometric Failure')
+points(sel[ , c('longitude', 'latitude')], pch=20, col=sel$color, cex=3)
+textxy(sel$longitude, sel$latitude, labs=paste0(sel$Landscape.., '\n', paste0(round(sel$percent_Composite_Index_Anthropometric_Failure), '%')), cex=0.5)
+```
+
+##Ghana
+```{r, echo=FALSE, warning=FALSE}
+
+ggplot(nutrition_indid[nutrition_indid$Country=='GHA', ], aes(value, fill = Landscape)) +
+  geom_density(alpha = 0.2) + 
+  ggtitle("Ditribution of children's measurments (6 months - 5 years old)") + 
+  geom_vline(aes(xintercept = -2, colour='Failure')) + 
+  geom_vline(aes(xintercept = -3, colour='Severe Failure'), size=1) + 
+  xlab('Z-scores for childrens measurements, normalized by age') +
+  facet_grid(.~variable) + 
+  theme(legend.position="bottom")
+
+
+map('worldHires', 'Ghana') 
+sel <- nutrition_landscape[nutrition_landscape$Country=='GHA' , ]
+title('Percentage of children with any Anthropometric Failure')
+points(sel[ , c('longitude', 'latitude')], pch=20, col=sel$color, cex=3)
+textxy(sel$longitude, sel$latitude, labs=paste0(sel$Landscape.., '\n', paste0(round(sel$percent_Composite_Index_Anthropometric_Failure), '%')), cex=0.7)
+```
+
+##Uganda
+```{r, echo=FALSE, warning=FALSE}
+
+ggplot(nutrition_indid[nutrition_indid$Country=='UGA', ], aes(value, fill = Landscape)) +
+  geom_density(alpha = 0.2) + 
+  ggtitle("Ditribution of children's measurments (6 months - 5 years old)") + 
+  geom_vline(aes(xintercept = -2, colour='Failure')) + 
+  geom_vline(aes(xintercept = -3, colour='Severe Failure'), size=1) + 
+  xlab('Z-scores for childrens measurements, normalized by age') +
+  facet_grid(.~variable) + 
+  theme(legend.position="bottom")
+
+
+map('worldHires', 'Uganda') 
+sel <- nutrition_landscape[nutrition_landscape$Country=='UGA' , ]
+title('Percentage of children with any Anthropometric Failure')
+points(sel[ , c('longitude', 'latitude')], pch=20, col=sel$color, cex=3)
+textxy(sel$longitude, sel$latitude, labs=paste0(sel$Landscape.., '\n', paste0(round(sel$percent_Composite_Index_Anthropometric_Failure), '%')), cex=0.7)
+```
+
+
+##Rwanda
+```{r, echo=FALSE, warning=FALSE}
+
+ggplot(nutrition_indid[nutrition_indid$Country=='RWA', ], aes(value, fill = Landscape)) +
+  geom_density(alpha = 0.2) + 
+  ggtitle("Ditribution of children's measurments (6 months - 5 years old)") + 
+  geom_vline(aes(xintercept = -2, colour='Failure')) + 
+  geom_vline(aes(xintercept = -3, colour='Severe Failure'), size=1) + 
+  xlab('Z-scores for childrens measurements, normalized by age') +
+  facet_grid(.~variable) + 
+  theme(legend.position="bottom")
+
+
+map('worldHires', 'Rwanda') 
+sel <- nutrition_landscape[nutrition_landscape$Country=='RWA' , ]
+title('Percentage of children with any Anthropometric Failure')
+points(sel[ , c('longitude', 'latitude')], pch=20, col=sel$color, cex=3)
+textxy(sel$longitude, sel$latitude, labs=paste0(sel$Landscape.., '\n', paste0(round(sel$percent_Composite_Index_Anthropometric_Failure), '%')), cex=0.7)
+```

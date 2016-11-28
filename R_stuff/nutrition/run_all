@@ -1,0 +1,3 @@
+#!/bin/bash
+Rscript Nutrition.VS.R
+python load_into_postgres.py
