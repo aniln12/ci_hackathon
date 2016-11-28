@@ -6,3 +6,15 @@
 
 # UI
 •	Users should be able to select different variable sets, indicators and geographic levels for comparison and be able to set filters as needed to instantly get visual insights.
+
+# Data points
+* agricultural production
+* water availability and quality
+* soil health
+* biodiversity
+* carbon stocks
+* climate
+* weather
+* household income
+* food security
+* nutrition and market access.
