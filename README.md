@@ -17,4 +17,4 @@
 * weather
 * household income
 * food security
-* nutrition and market access.
+* nutrition and market access
