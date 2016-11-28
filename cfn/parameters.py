@@ -15,3 +15,8 @@ public_subnets = {
 r_processing_ami = 'ami-40d28157'
 webapp_ami = 'ami-40d28157'
 
+
+# It is assumed that the RDS instance is outside the purview of this cfn stack.
+# Therefore provide a security group id that is "trusted" by RDS.
+database_client_sg = 'sg-8dd5b1f0'
+

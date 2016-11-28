@@ -2,6 +2,7 @@ import boto3
 import botocore
 import difflib
 import json
+import sys
 import troposphere
 
 
@@ -55,4 +56,5 @@ class StackTemplate(troposphere.Template):
         ensure_stack(
             StackName=self.stack_name,
             TemplateBody=self.to_json(),
+            Capabilities=['CAPABILITY_IAM'],
         )
