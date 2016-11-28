@@ -1,3 +1,10 @@
+build:
+  image: python
+  commands:
+    - cd backend
+    - pip install -r requirements.txt --use-mirrors
+    - nosetests
+
 notify:
   gitter:
     webhook: https://webhooks.gitter.im/e/0a2b57763cc70c2be9d9
