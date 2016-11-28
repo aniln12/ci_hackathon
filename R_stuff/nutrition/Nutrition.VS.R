@@ -25,7 +25,7 @@
 library(dplyr)
 library(zoo)
 
-setwd("/home/ubuntu/camilo/files/r-scripts/Nutrition")  # replace with your working directory here
+setwd("/home/ubuntu/ci_hackathon-master/R_stuff/Nutrition")  # replace with your working directory here
 
 pg_conf <- read.csv('rds_settings.csv', stringsAsFactors=FALSE)
 
