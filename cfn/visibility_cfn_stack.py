@@ -7,8 +7,9 @@ from awacs.aws import (
     Allow, Policy, Statement
 )
 from awacs import logs as awacs_logs
-from troposphere import autoscaling, Ref, logs, iam, ec2, GetAtt, Tags
+from troposphere import autoscaling, Ref, logs, iam, ec2, GetAtt, Tags, Output, Join
 from troposphere import elasticloadbalancingv2 as elb
+from troposphere import cloudfront, waf
 
 import parameters
 import stack
@@ -85,9 +86,8 @@ user_data = {
             '/usr/bin/curl', '-L', '-O',
             'https://github.com/xsmaster/ci_hackathon/archive/master.zip'
         ],
-        [
-            '/usr/bin/unzip', 'master.zip',
-        ],
+        ['/usr/bin/unzip', 'master.zip',],
+        ['/usr/bin/sudo', 'ci_hackathon-master/setup.sh',],
     ]
 }
 if 'packages' not in user_data:
@@ -111,8 +111,7 @@ r_packages = [
 r_server_user_data = copy.deepcopy(user_data)
 for package in r_packages:
     line = ['R', '-q', '-e', '"install.packages(\'%s\', repos=\'http://cran.rstudio.com/\')"' % (package,)]
-    r_server_user_data['packages'].append(line)
-    print 'sudo ' + ' '.join(line)
+    r_server_user_data['runcmd'].append(line)
 
 r_server_user_data['runcmd'].append(
     ['/usr/bin/sudo', '/usr/bin/apt', 'install', '-y', 'libpq-dev', 'r-base']
@@ -253,6 +252,7 @@ webserver_listener = stack.add_resource(elb.Listener(
 ))
 
 
+
 webserver_lc = stack.add_resource(autoscaling.LaunchConfiguration(
     'WebServerLC',
     IamInstanceProfile=Ref(instance_profile),
@@ -271,12 +271,93 @@ web_server_asg = stack.add_resource(autoscaling.AutoScalingGroup(
     'WebServerASG',
     LaunchConfigurationName=Ref(webserver_lc),
     MaxSize=2,
-    MinSize=1,
+    MinSize=2,
     Tags=autoscaling.Tags(Name='webserver'),
     TargetGroupARNs=[Ref(webserver_target_group)],
     VPCZoneIdentifier=parameters.private_subnets.values(),
     DependsOn=ourelb.name,
 ))
+
+sql_injection_rule = stack.add_resource(waf.SqlInjectionMatchSet(
+    'SqlInjectionRule',
+    Name='VisSqlInjectionRule',
+    SqlInjectionMatchTuples=[
+        waf.SqlInjectionMatchTuples(
+            FieldToMatch=waf.FieldToMatch(
+                Type="QUERY_STRING",
+            ),
+            TextTransformation="URL_DECODE",
+        ),
+    ],
+))
+
+waf = stack.add_resource(waf.WebACL(
+    'VisWaf',
+    DefaultAction=waf.Action(Type='ALLOW'),
+    Name='VisibilityWaf',
+    MetricName='VisibilityWaf',
+    #Rules=[
+        #waf.Rules(
+            #Action=waf.Action(Type='BLOCK'),
+            #Priority=1,
+            #RuleId=Ref(sql_injection_rule),
+        #),
+    #],
+))
+
+cloudfront_distribution = stack.add_resource(cloudfront.Distribution(
+    'visibilitycloudfront',
+    DistributionConfig=cloudfront.DistributionConfig(
+        WebACLId=Ref(waf),
+        Origins=[
+            cloudfront.Origin(
+                Id='apiv1',
+                DomainName='applicationelasticlb-208988572.us-east-1.elb.amazonaws.com',
+                CustomOriginConfig=cloudfront.CustomOrigin(
+                    HTTPPort="80",
+                    OriginProtocolPolicy="http-only",
+                ),
+            ),
+            cloudfront.Origin(
+                Id='staticv1',
+                DomainName='cihackathon.s3.amazonaws.com',
+                S3OriginConfig=cloudfront.S3Origin(),
+            ),
+        ],
+        DefaultCacheBehavior=cloudfront.DefaultCacheBehavior(
+            TargetOriginId="staticv1",
+            ForwardedValues=cloudfront.ForwardedValues(
+                QueryString=False,
+            ),
+            ViewerProtocolPolicy="allow-all",
+            MinTTL=1,
+            MaxTTL=60,
+        ),
+        CacheBehaviors=[
+            cloudfront.CacheBehavior(
+                TargetOriginId='apiv1',
+                ForwardedValues=cloudfront.ForwardedValues(
+                    QueryString=True,
+                ),
+                ViewerProtocolPolicy="allow-all",
+                MinTTL=1,
+                MaxTTL=60,
+                PathPattern='/api/v1/*',
+            ),
+        ],
+        Enabled=True,
+        HttpVersion='http1.1',
+    ),
+))
+stack.add_output([
+    Output(
+        "VisibilityUrl",
+        Value=Join("", ["http://", GetAtt(cloudfront_distribution, "DomainName")])
+    )
+])
+
+
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
