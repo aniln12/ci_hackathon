@@ -45,7 +45,13 @@
         
         $("#output").pivotUI(parsed.data, {
             rows: ["Petal.Length"],
-            cols: ["Petal.Width", "Species"]
+            cols: ["Petal.Width", "Species"],
+            aggregatorName: "Sum over Sum",
+            rendererName: "Bar Chart",
+            renderers: $.extend(
+                    $.pivotUtilities.renderers,
+                    $.pivotUtilities.c3_renderers
+            )
 
         });
         }
