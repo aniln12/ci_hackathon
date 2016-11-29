@@ -4,7 +4,7 @@ from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
 
-host, un, pw, port = 'conservation-intl.clqfooklvyn0.us-east-1.rds.amazonaws.com','postgres','postgres',5432 
+host, un, pw, port = 'localhost','postgres','postgres',5432 
 dbname = 'vitalsigns_staging'
 engine = create_engine('postgresql://{un}:{pw}@{host}:{port}/{dbname}'.format(
         un=un,

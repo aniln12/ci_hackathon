@@ -8,6 +8,7 @@ from awacs.aws import (
 )
 from awacs import logs as awacs_logs
 from troposphere import autoscaling, Ref, logs, iam, ec2, GetAtt, Tags
+from troposphere import elasticloadbalancingv2 as elb
 
 import parameters
 import stack
@@ -63,7 +64,8 @@ user_data = {
         # Need python installed before we run python down there. The packages
         # directive apparently runs after runcmd. Gah.
         ['/usr/bin/sudo', '/usr/bin/apt', 'install', '-y',
-            'python', 'python-setuptools', 'python-pip', 'python-psycopg2'],
+            'python', 'python-setuptools', 'python-pip', 'python-psycopg2',
+            'unzip'],
         [
             '/usr/bin/curl',
             'https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py',
@@ -118,7 +120,11 @@ r_server_user_data['runcmd'].append(
 
 
 webserver_user_data = copy.deepcopy(user_data)
-webserver_user_data['packages'].append('nginx')
+webserver_user_data['packages'].extend([
+    'nginx',
+    'uwsgi',
+    'uwsgi-plugin-python',
+])
 
 stack = stack.StackTemplate()
 
@@ -171,6 +177,32 @@ default_instance_sg = stack.add_resource(ec2.SecurityGroup(
     ]
 ))
 
+elb_sg = stack.add_resource(ec2.SecurityGroup(
+    'elbSG',
+    GroupDescription='elb sg',
+    SecurityGroupIngress=[
+        ec2.SecurityGroupRule(
+            IpProtocol='6',
+            CidrIp='0.0.0.0/0',
+            ToPort=80,
+            FromPort=80,
+        )
+    ]
+))
+
+web_sg = stack.add_resource(ec2.SecurityGroup(
+    'webSG',
+    GroupDescription='web sg',
+    SecurityGroupIngress=[
+        ec2.SecurityGroupRule(
+            IpProtocol='6',
+            SourceSecurityGroupId=GetAtt(elb_sg, 'GroupId'),
+            ToPort=80,
+            FromPort=80,
+        )
+    ]
+))
+
 r_script_runner_lc = stack.add_resource(autoscaling.LaunchConfiguration(
     'RScriptRunnerLC',
     IamInstanceProfile=Ref(instance_profile),
@@ -194,6 +226,33 @@ r_script_runner_asg = stack.add_resource(autoscaling.AutoScalingGroup(
 ))
 
 
+ourelb = stack.add_resource(elb.LoadBalancer(
+    "ApplicationElasticLB",
+    Name="ApplicationElasticLB",
+    Scheme="internet-facing",
+    Subnets=parameters.public_subnets.values(),
+    SecurityGroups=[GetAtt(elb_sg, 'GroupId')],
+))
+
+webserver_target_group = stack.add_resource(elb.TargetGroup(
+    "WebserverTarget",
+    Port=80,
+    Protocol='HTTP',
+    VpcId=parameters.vpc_id,
+))
+
+webserver_listener = stack.add_resource(elb.Listener(
+    "WebserverListener",
+    Port=80,
+    Protocol='HTTP',
+    LoadBalancerArn=Ref(ourelb),
+    DefaultActions=[elb.Action(
+        Type="forward",
+        TargetGroupArn=Ref(webserver_target_group),
+    )]
+))
+
+
 webserver_lc = stack.add_resource(autoscaling.LaunchConfiguration(
     'WebServerLC',
     IamInstanceProfile=Ref(instance_profile),
@@ -204,6 +263,7 @@ webserver_lc = stack.add_resource(autoscaling.LaunchConfiguration(
     SecurityGroups=[
         parameters.database_client_sg,
         GetAtt(default_instance_sg, 'GroupId'),
+        GetAtt(web_sg, 'GroupId'),
     ]
 ))
 
@@ -213,7 +273,9 @@ web_server_asg = stack.add_resource(autoscaling.AutoScalingGroup(
     MaxSize=2,
     MinSize=1,
     Tags=autoscaling.Tags(Name='webserver'),
+    TargetGroupARNs=[Ref(webserver_target_group)],
     VPCZoneIdentifier=parameters.private_subnets.values(),
+    DependsOn=ourelb.name,
 ))
 
 if __name__ == '__main__':

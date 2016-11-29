@@ -58,7 +58,7 @@
         $(function(){
             function load() {
                 var endpoint = $("#dataset-select").val();
-                Papa.parse("http://localhost:5000/" + endpoint, {
+                Papa.parse("http://applicationelasticlb-208988572.us-east-1.elb.amazonaws.com/" + endpoint, {
                     download: true,
                     complete: function(parsed){          
                 
