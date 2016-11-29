@@ -58,13 +58,13 @@
         $(function(){
             function load() {
                 var endpoint = $("#dataset-select").val();
-                Papa.parse("http://applicationelasticlb-208988572.us-east-1.elb.amazonaws.com/" + endpoint, {
+                Papa.parse("http://localhost:5000/" + endpoint, {
                     download: true,
                     complete: function(parsed){          
                 
                 $("#output").pivotUI(parsed.data, {
-                     rows: ["country"],
-                     cols: ["landscape_no"],
+                     rows: ["landscape_no"],
+                     cols: ["country"],
                      vals: ["Fertilizer weight in KGS"],
                      aggregatorName: "Average",
                      rendererName: "Bar Chart",
