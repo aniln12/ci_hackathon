@@ -33,7 +33,7 @@
     $(function(){
 
 
-        Papa.parse("http://localhost:5000/fertilizer_use", {
+        Papa.parse("data/iris.csv", {
             download: true,
             complete: function(parsed){
         
@@ -41,7 +41,13 @@
         
         $("#output").pivotUI(parsed.data, {
             rows: ["Petal.Length"],
-            cols: ["Petal.Width", "Species"]
+            cols: ["Petal.Width", "Species"],
+            aggregatorName: "Sum over Sum",
+            rendererName: "Bar Chart",
+            renderers: $.extend(
+                    $.pivotUtilities.renderers,
+                    $.pivotUtilities.c3_renderers
+            )
 
         });
         }
