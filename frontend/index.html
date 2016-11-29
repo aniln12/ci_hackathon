@@ -63,11 +63,12 @@
                     complete: function(parsed){          
                 
                 $("#output").pivotUI(parsed.data, {
-                    rows: ["Petal.Length"],
-                    cols: ["Petal.Width", "Species"],
-                    aggregatorName: "Sum over Sum",
-                    rendererName: "Bar Chart",
-                    renderers: $.extend(
+                     rows: ["country"],
+                     cols: ["landscape_no"],
+                     vals: ["Fertilizer weight in KGS"],
+                     aggregatorName: "Average",
+                     rendererName: "Bar Chart",
+                     renderers: $.extend(
                             $.pivotUtilities.renderers,
                             $.pivotUtilities.c3_renderers
                     )
