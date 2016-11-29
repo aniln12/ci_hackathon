@@ -13,8 +13,10 @@
 
     <!-- PivotTable.js libs from ../dist -->
     <link rel="stylesheet" type="text/css" href="dist/pivot.css">
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
     <script type="text/javascript" src="dist/pivot.js"></script>
     <script type="text/javascript" src="dist/c3_renderers.js"></script>
+    
     <style>
         body {font-family: Verdana;}
     </style>
@@ -24,6 +26,7 @@
 
 </head>
 <body>
+<i class="fa fa-spinner fa-spin" aria-hidden="true" id="loading-spinner" style="font-size:50px;"></i>
 <script type="text/javascript">
     // This example is the most basic usage of pivotUI()
 
@@ -33,7 +36,9 @@
         Papa.parse("http://localhost:5000/fertilizer_use", {
             download: true,
             complete: function(parsed){
-
+        
+        $("#loading-spinner").hide();
+        
         $("#output").pivotUI(parsed.data, {
             rows: ["Petal.Length"],
             cols: ["Petal.Width", "Species"]
