@@ -12,13 +12,21 @@ engine = create_engine('postgresql://{un}:{pw}@{host}:{port}/{dbname}'.format(
         host=host,
         port=port,
         dbname=dbname))
+        
+rdbname=r_output
+rengine = create_engine('postgresql://{un}:{pw}@{host}:{port}/{rdbname}'.format(
+        un=un,
+        pw=pw,
+        host=host,
+        port=port,
+        dbname=dbname))
 
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-def get_csv(sql_text):
+def get_csv(sql_text,engine_to_use=engine):
 	sql = text(sql_text)
-	result = engine.execute(sql)
+	result = engine_to_use.execute(sql)
 	header = ",".join(result.keys())
 	rows = "\n".join(",".join(str(v) for v in row) for row in result.fetchall())    
     
@@ -29,4 +37,10 @@ def get_csv(sql_text):
 def fertilizer_use():
     sql_text = 'SELECT * from public."full_fertilizer_data"'
     return get_csv(sql_text)
+
+@app.route('/nutrition_landscape')
+@cross_origin()
+def nutrition_landscape():
+    sql_text = 'SELECT * from public."nutrition_landscape_query"'
+    return get_csv(sql_text,rengine)
 
