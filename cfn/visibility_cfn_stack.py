@@ -21,7 +21,13 @@ state_file = /var/awslogs/state/agent-state
 [/var/log/syslog]
 file = /var/log/syslog
 log_group_name = conservationintl
-log_stream_name = {instance_id}
+log_stream_name = {instance_id}-syslog
+datetime_format = %b %d %H:%M:%S
+
+[/var/log/uwsgi/conservationintl.log]
+file = /var/log/uwsgi/conservationintl.log
+log_group_name = conservationintl
+log_stream_name = {instance_id}-uwsgi
 datetime_format = %b %d %H:%M:%S
 """
 
