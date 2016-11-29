@@ -1,3 +1,4 @@
+vpc_id = 'vpc-bd877ddb'
 private_subnets = {
     'us-east-1a': 'subnet-bb843de0',
     'us-east-1c': 'subnet-20b7330d',
