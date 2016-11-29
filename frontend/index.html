@@ -58,10 +58,9 @@
         $(function(){
             function load() {
                 var endpoint = $("#dataset-select").val();
-                Papa.parse("http://localhost:5000/" + endpoint, {
+                Papa.parse("http://d1zh7t0qlrhg3y.cloudfront.net/api/v1/" + endpoint, {
                     download: true,
-                    complete: function(parsed){          
-                
+                    complete: function(parsed){
                 $("#output").pivotUI(parsed.data, {
                      rows: ["landscape_no"],
                      cols: ["country"],
