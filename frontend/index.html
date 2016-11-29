@@ -42,9 +42,9 @@
 <div class="container-fluid">
     <div>
         <p>Select your dataset:</p>
-        <select>
+        <select id="dataset-select">
             <option value="fertilizer_use">Fertilizer Use</option>
-            <option value="nutrion_landscape">Nutitrion Landscape Relationships</option>
+            <option value="nutrition_landscape">Nutitrion Landscape Relationships</option>
         </select>
     </div>
     <div id="output" style="margin: 30px;">
@@ -56,28 +56,35 @@
         // This example is the most basic usage of pivotUI()
 
         $(function(){
+            function load() {
+                var endpoint = $("#dataset-select").val();
+                Papa.parse("http://localhost:5000/" + endpoint, {
+                    download: true,
+                    complete: function(parsed){          
+                
+                $("#output").pivotUI(parsed.data, {
+                    rows: ["Petal.Length"],
+                    cols: ["Petal.Width", "Species"],
+                    aggregatorName: "Sum over Sum",
+                    rendererName: "Bar Chart",
+                    renderers: $.extend(
+                            $.pivotUtilities.renderers,
+                            $.pivotUtilities.c3_renderers
+                    )
 
-
-            Papa.parse("http://localhost:5000/fertilizer_use", {
-                download: true,
-                complete: function(parsed){          
-            
-            $("#output").pivotUI(parsed.data, {
-                rows: ["Petal.Length"],
-                cols: ["Petal.Width", "Species"],
-                aggregatorName: "Sum over Sum",
-                rendererName: "Bar Chart",
-                renderers: $.extend(
-                        $.pivotUtilities.renderers,
-                        $.pivotUtilities.c3_renderers
-                )
-
-            });
-            }
+                });
                 }
+                    }
 
-            );
-        });
+                );
+            }
+            
+            $('select').on('change', function() {
+              load();
+            });
+            
+            load();
+        });      
     </script>
 </body>
 </html>
