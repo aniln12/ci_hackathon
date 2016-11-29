@@ -19,7 +19,7 @@
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
     <script type="text/javascript" src="dist/pivot.js"></script>
     <script type="text/javascript" src="dist/c3_renderers.js"></script>
-    
+
     <style>
         body {font-family: Verdana;}
     </style>
@@ -32,11 +32,11 @@
 <div class="navbar navbar-default navbar-static-top" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
-            <a href="http://www.conservation.org"><img alt="Conservation International" src="http://www.conservation.org/Style%20Library/CI/images/ciLogo_Large.svg" style="width: 200px;" /></a>            
+            <a href="http://www.conservation.org"><img alt="Conservation International" src="http://www.conservation.org/Style%20Library/CI/images/ciLogo_Large.svg" style="width: 200px;" /></a>
         </div>
         <div class="navbar-header">
             <span class="navbar-brand" style="margin-left: 10px;">Data Viewer</span>
-        </div>        
+        </div>
     </div>
 </div>
 <div class="container-fluid">
@@ -45,11 +45,12 @@
         <select id="dataset-select">
             <option value="fertilizer_use">Fertilizer Use</option>
             <option value="nutrition_landscape">Nutitrion Landscape Relationships</option>
-        </select>
+            <option value="parent_nutrition_child_education">Parent education Child nutrition Relationships</option>
+  </select>
     </div>
     <div id="output" style="margin: 30px;">
         <!--Using Pace instead-->
-        <!--<i class="fa fa-spinner fa-spin" aria-hidden="true" id="loading-spinner" style="font-size:50px;"></i>-->        
+        <!--<i class="fa fa-spinner fa-spin" aria-hidden="true" id="loading-spinner" style="font-size:50px;"></i>-->
     </div>
 </div>
  <script type="text/javascript">
@@ -78,13 +79,13 @@
 
                 );
             }
-            
+
             $('select').on('change', function() {
               load();
             });
-            
+
             load();
-        });      
+        });
     </script>
 </body>
 </html>
