@@ -14,6 +14,7 @@
     <!-- PivotTable.js libs from ../dist -->
     <link rel="stylesheet" type="text/css" href="dist/pivot.css">
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
     <script type="text/javascript" src="dist/pivot.js"></script>
     <script type="text/javascript" src="dist/c3_renderers.js"></script>
     
@@ -26,42 +27,54 @@
 
 </head>
 <body>
-<i class="fa fa-spinner fa-spin" aria-hidden="true" id="loading-spinner" style="font-size:50px;"></i>
-<select>
-    <option value="fertilizer_use">Fertilizer Use</option>
-    <option value="nutrion_landscape">Nutitrion Landscape Relationships</option>
-</select>
-<script type="text/javascript">
-    // This example is the most basic usage of pivotUI()
+<div class="navbar navbar-default navbar-static-top" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a href="http://www.conservation.org"><img alt="Conservation International" src="http://www.conservation.org/Style%20Library/CI/images/ciLogo_Large.svg" style="width: 200px;" /></a>            
+        </div>
+        <div class="navbar-header">
+            <span class="navbar-brand" style="margin-left: 10px;">Data Viewer</span>
+        </div>        
+    </div>
+</div>
+<div class="container-fluid">
+    <div>
+        <p>Select your dataset:</p>
+        <select>
+            <option value="fertilizer_use">Fertilizer Use</option>
+            <option value="nutrion_landscape">Nutitrion Landscape Relationships</option>
+        </select>
+    </div>
+    <div id="output" style="margin: 30px;">
+        <i class="fa fa-spinner fa-spin" aria-hidden="true" id="loading-spinner" style="font-size:50px;"></i>
+    </div>
+</div>
+ <script type="text/javascript">
+        // This example is the most basic usage of pivotUI()
 
-    $(function(){
+        $(function(){
 
 
-        Papa.parse("http://localhost:5000/fertilizer_use", {
-            download: true,
-            complete: function(parsed){
-        
-        $("#loading-spinner").hide();
-        
-        $("#output").pivotUI(parsed.data, {
-            rows: ["Petal.Length"],
-            cols: ["Petal.Width", "Species"],
-            aggregatorName: "Sum over Sum",
-            rendererName: "Bar Chart",
-            renderers: $.extend(
-                    $.pivotUtilities.renderers,
-                    $.pivotUtilities.c3_renderers
-            )
+            Papa.parse("http://localhost:5000/fertilizer_use", {
+                download: true,
+                complete: function(parsed){          
+            
+            $("#output").pivotUI(parsed.data, {
+                rows: ["Petal.Length"],
+                cols: ["Petal.Width", "Species"],
+                aggregatorName: "Sum over Sum",
+                rendererName: "Bar Chart",
+                renderers: $.extend(
+                        $.pivotUtilities.renderers,
+                        $.pivotUtilities.c3_renderers
+                )
 
-        });
-        }
+            });
             }
+                }
 
-        );
-    });
-</script>
-
-<div id="output" style="margin: 30px;"></div>
-
+            );
+        });
+    </script>
 </body>
 </html>
