@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, text
 
 app = Flask(__name__)
 
-host, un, pw, port = 'conservation-intl.clqfooklvyn0.us-east-1.rds.amazonaws.com','postgres','postgres',5432 
+host, un, pw, port = 'conservation-intl.clqfooklvyn0.us-east-1.rds.amazonaws.com','postgres','postgres',5432
 dbname = 'vitalsigns_staging'
 engine = create_engine('postgresql://{un}:{pw}@{host}:{port}/{dbname}'.format(
         un=un,
@@ -11,10 +11,10 @@ engine = create_engine('postgresql://{un}:{pw}@{host}:{port}/{dbname}'.format(
         host=host,
         port=port,
         dbname=dbname))
-        
+
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-        
+
 rdbname='r_output'
 rengine = create_engine('postgresql://{un}:{pw}@{host}:{port}/{dbname}'.format(
         un=un,
@@ -40,3 +40,7 @@ def nutrition_landscape():
     sql_text = 'SELECT * from public."nutrition_landscape_query"'
     return get_csv(sql_text,rengine)
 
+@app.route('/api/v1/parent_nutrition_child_education')
+def nutrition_landscape():
+    sql_text = 'SELECT * from public."parent_child_query"'
+    return get_csv(sql_text,rengine)
